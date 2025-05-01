@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <v-layout class="todo-layout">
+
       <!-- Sidebar with rail (auto-collapse) -->
       <v-navigation-drawer
           v-model="drawer"
@@ -8,6 +9,7 @@
           permanent
           class="todo-sidebar"
       >
+
         <v-list-item
             title="Vue TODO"
             nav
@@ -20,7 +22,11 @@
             />
           </template>
         </v-list-item>
-
+        <v-list-item
+            prepend-icon="mdi-theme-light-dark"
+            title="Тема"
+            @click="toggleTheme"
+        />
         <v-divider class="my-2" />
 
         <v-list nav>
@@ -47,6 +53,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useTheme } from 'vuetify';
 
 const drawer = ref(true);
 const rail = ref(true);
@@ -56,6 +63,16 @@ const menuItems = [
   { title: 'Сегодня', icon: 'mdi-calendar-today' },
   { title: 'Предстоящее', icon: 'mdi-calendar-month' },
 ];
+
+const theme = useTheme();
+const isDark = ref(false);
+
+function toggleTheme() {
+  isDark.value = !isDark.value;
+  theme.global.name.value = isDark.value ? 'dark' : 'light';
+
+
+}
 </script>
 <style scoped>
 .todo-layout {
@@ -63,14 +80,21 @@ const menuItems = [
 }
 
 .todo-sidebar {
-  background-color: #fff;
+  background-color: var(--v-theme-surface);
   border-right: 1px solid #e0e0e0;
-  transition: width 0.3s;
+  transition: width 0.3s, background-color 0.3s;
 }
 
 .main-area {
-  background-color: #f9fafc;
+  background-color: var(--v-theme-background);
+  transition: background-color 0.3s;
 }
+
+.view-title {
+  color: var(--v-theme-on-background);
+}
+
+
 
 .main-container {
   padding: 24px;
@@ -80,7 +104,6 @@ const menuItems = [
   font-size: 26px;
   font-weight: 600;
   margin-bottom: 24px;
-  color: #2c3e50;
 }
 
 .nav-item {
