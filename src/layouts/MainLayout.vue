@@ -51,15 +51,28 @@
                   <div class="project-color" :style="{ backgroundColor: project.color }" />
                   <span v-if="!rail" class="project-name ml-2">{{ project.name }}</span>
                 </div>
-                <v-btn
-                    icon
-                    variant="text"
-                    size="x-small"
-                    @click.stop="askDeleteProject(project)"
-                    v-if="!rail"
-                >
-                  <v-icon size="18">mdi-delete</v-icon>
-                </v-btn>
+                <div class="d-flex align-center">
+                  <v-btn
+                      icon
+                      variant="text"
+                      size="x-small"
+                      @click.stop="askEditProject(project)"
+                      v-if="!rail"
+                  >
+                    <v-icon size="18">mdi-pencil</v-icon>
+                  </v-btn>
+
+                  <v-btn
+                      icon
+                      variant="text"
+                      size="x-small"
+                      @click.stop="askDeleteProject(project)"
+                      v-if="!rail"
+                  >
+                    <v-icon size="18">mdi-delete</v-icon>
+                  </v-btn>
+                </div>
+
               </div>
             </v-list>
           </div>
@@ -93,6 +106,11 @@
               :project="projectToDelete"
               @confirm="confirmDelete"
           />
+          <EditProjectDialog
+              v-model="stateEditProject"
+              :project="projectToEdit"
+              @submit="handleProjectEdit"
+          />
 
           <router-view />
         </v-container>
@@ -110,6 +128,7 @@ import DeleteProjectDialog from '../components/DeleteProjectDialog.vue';
 
 import { Project } from '../models/Project';
 import { ProjectRepository } from '../service/ProjectRepository';
+import EditProjectDialog from '../components/EditProjectDialog.vue';
 
 // sidebar
 const drawer = ref(true);
@@ -153,7 +172,20 @@ function confirmDelete() {
   projectToDelete.value = null;
   confirmDeleteDialog.value = false;
 }
+// edit project
+const stateEditProject = ref(false);
+const projectToEdit = ref<Project | null>(null);
 
+function askEditProject(project: Project) {
+  projectToEdit.value = project;
+  stateEditProject.value = true;
+}
+
+function handleProjectEdit(updated: Project) {
+  projectRepo.update(updated);
+  const index = projects.value.findIndex(p => p.id === updated.id);
+  if (index !== -1) projects.value[index] = updated;
+}
 // static nav menu
 const menuItems = [
   { title: 'Входящие', icon: 'mdi-inbox-arrow-down' },
