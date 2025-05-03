@@ -42,24 +42,31 @@
               />
             </v-list>
             <v-list nav>
-              <v-list-item
+              <div
                   v-for="project in projects"
                   :key="project.id"
-                  :title="!rail ? project.name : ''"
-                  :prepend-icon="'mdi-circle'"
-                  color="primary"
-                  :style="{ color: project.color }"
-                  variant="tonal"
-                  rounded="lg"
+                  class="project-item d-flex align-center justify-space-between"
               >
-                
-
-              </v-list-item>
+                <div class="d-flex align-center">
+                  <div class="project-color" :style="{ backgroundColor: project.color }" />
+                  <span v-if="!rail" class="project-name ml-2">{{ project.name }}</span>
+                </div>
+                <v-btn
+                    icon
+                    variant="text"
+                    size="x-small"
+                    @click.stop="askDeleteProject(project)"
+                    v-if="!rail"
+                >
+                  <v-icon size="18">mdi-delete</v-icon>
+                </v-btn>
+              </div>
             </v-list>
           </div>
 
           <!-- Bottom button -->
           <div class="pa-2">
+
             <v-btn
                 block
                 prepend-icon="mdi-plus"
@@ -209,9 +216,35 @@ const menuItems = [
 .project-name {
   flex-grow: 1;
   font-size: 14px;
+  white-space: normal;           /* ✅ Разрешаем перенос */
+  word-break: break-word;        /* ✅ Переносим длинные слова */
+  max-width: 160px;              /* ✅ Ограничение ширины */
+  text-overflow: ellipsis;
+}
+
+
+.project-item {
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.project-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.project-color {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.project-name {
+  font-size: 14px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 
 </style>
