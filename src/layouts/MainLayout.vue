@@ -36,44 +36,51 @@
                   :key="item.title"
                   :title="item.title"
                   :prepend-icon="item.icon"
+                  :to="item.to"
+                  link
                   color="primary"
                   variant="tonal"
                   rounded="lg"
               />
             </v-list>
+
             <v-list nav>
-              <div
+              <v-list-item
                   v-for="project in projects"
                   :key="project.id"
-                  class="project-item d-flex align-center justify-space-between"
+                  @click="handleProjectClick($event, project)"
+                  router
+                  link
+                  rounded="lg"
+                  variant="tonal"
               >
-                <div class="d-flex align-center">
-                  <div class="project-color" :style="{ backgroundColor: project.color }" />
-                  <span v-if="!rail" class="project-name ml-2">{{ project.name }}</span>
-                </div>
-                <div class="d-flex align-center">
+              <div :style="
+                   { display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between'}"
+              >
+                <div class="project-color" :style="{ backgroundColor: project.color, }" />
+
+                <span v-if="!rail" class="project-name">{{ project.name }}</span>
+
+                <div class="d-flex align-center" v-if="!rail" @click.stop>
                   <v-btn
                       icon
                       variant="text"
                       size="x-small"
                       @click.stop="askEditProject(project)"
-                      v-if="!rail"
                   >
                     <v-icon size="18">mdi-pencil</v-icon>
                   </v-btn>
-
                   <v-btn
                       icon
                       variant="text"
                       size="x-small"
                       @click.stop="askDeleteProject(project)"
-                      v-if="!rail"
                   >
                     <v-icon size="18">mdi-delete</v-icon>
                   </v-btn>
                 </div>
-
-              </div>
+          </div>
+              </v-list-item>
             </v-list>
           </div>
 
@@ -122,6 +129,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useTheme } from 'vuetify';
+import { useRouter } from 'vue-router';
 
 import CreateProjectDialog from '../components/CreateProjectDialog.vue';
 import DeleteProjectDialog from '../components/DeleteProjectDialog.vue';
@@ -130,6 +138,7 @@ import { Project } from '../models/Project';
 import { ProjectRepository } from '../service/ProjectRepository';
 import EditProjectDialog from '../components/EditProjectDialog.vue';
 
+const router = useRouter();
 // sidebar
 const drawer = ref(true);
 const rail = ref(true);
@@ -188,10 +197,23 @@ function handleProjectEdit(updated: Project) {
 }
 // static nav menu
 const menuItems = [
-  { title: 'Входящие', icon: 'mdi-inbox-arrow-down' },
-  { title: 'Сегодня', icon: 'mdi-calendar-today' },
-  { title: 'Предстоящее', icon: 'mdi-calendar-month' },
+  { title: 'Входящие', icon: 'mdi-inbox-arrow-down', to: '/inbox' },
+  { title: 'Сегодня', icon: 'mdi-calendar-today', to: '/today' },
+  { title: 'Предстоящее', icon: 'mdi-calendar-month', to: '/upcoming' },
 ];
+
+
+function handleProjectClick(event: MouseEvent, project: Project) {
+  const clickedElement = event.target as HTMLElement;
+
+  // Проверка, был ли клик по иконке или кнопке
+  if (clickedElement.closest('button') || clickedElement.closest('.v-btn')) {
+    return;
+  }
+
+  router.push(`/project/${project.id}`);
+}
+
 </script>
 
 <style scoped>
@@ -226,57 +248,33 @@ const menuItems = [
 }
 
 
-.project-item {
-  display: flex;
-  align-items: center;
-  padding: 4px 12px;
-  border-radius: 6px;
-  transition: background-color 0.2s;
-}
-
-.project-item:hover {
-  background-color: rgba(0, 0, 0, 0.04);
-}
 
 .project-color {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  margin-right: 10px;
+  margin: auto
 }
 
 .project-name {
   flex-grow: 1;
   font-size: 14px;
-  white-space: normal;           /* ✅ Разрешаем перенос */
-  word-break: break-word;        /* ✅ Переносим длинные слова */
-  max-width: 160px;              /* ✅ Ограничение ширины */
+  white-space: normal;
+  word-break: break-word;
+  max-width: 160px;
   text-overflow: ellipsis;
 }
-
-
-.project-item {
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: background-color 0.2s;
-}
-
-.project-item:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-.project-color {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
 .project-name {
   font-size: 14px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 120px;
 }
-
+.project-color {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
 
 </style>
