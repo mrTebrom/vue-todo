@@ -3,5 +3,9 @@ import './style.css'
 import App from './App.vue'
 import vuetify from './plugins/vuetify';
 import '@mdi/font/css/materialdesignicons.css';
+import router from './router';
 
-createApp(App).use(vuetify).mount('#app')
+createApp(App)
+    .use(router)
+    .use(vuetify)
+        .mount('#app')
